@@ -1,0 +1,9 @@
+Bugs fixed:
+
+1. **server.js** - referenced './routes' which did not exist, causing runtime failure on start. Implemented new Express app under `src/` instead.
+2. **package.json** - entry point was `src/index.js` but no such file existed. Added new implementation.
+3. **Missing middleware and services** - endpoint files referred to files that were not present (e.g., middleware/auth). Implemented minimal authentication middleware and routes.
+4. **Login and homepage not functional** - there was no working login/home implementation. Added `/auth/login` and protected home route `/` returning welcome message after JWT auth.
+5. **No tests** - project lacked tests for authentication routes. Added Jest tests verifying login success/failure and access to homepage.
+
+These fixes allow the application to start and handle user login using a hardcoded user, returning a JWT which grants access to the homepage.
