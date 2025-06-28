@@ -11,6 +11,12 @@ class VetFlowApp {
     }
 
     bindEvents() {
+        // Registration modal events
+        document.getElementById('registerBtn').addEventListener('click', () => this.showRegisterModal());
+        document.getElementById('closeRegisterModal').addEventListener('click', () => this.hideRegisterModal());
+        document.getElementById('cancelRegister').addEventListener('click', () => this.hideRegisterModal());
+        document.getElementById('registerForm').addEventListener('submit', (e) => this.handleRegister(e));
+
         // Login modal events
         document.getElementById('loginBtn').addEventListener('click', () => this.showLoginModal());
         document.getElementById('closeModal').addEventListener('click', () => this.hideLoginModal());
@@ -18,7 +24,13 @@ class VetFlowApp {
         document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
         document.getElementById('logoutBtn').addEventListener('click', () => this.handleLogout());
 
-        // Close modal when clicking outside
+        // Close modals when clicking outside
+        document.getElementById('registerModal').addEventListener('click', (e) => {
+            if (e.target.id === 'registerModal') {
+                this.hideRegisterModal();
+            }
+        });
+
         document.getElementById('loginModal').addEventListener('click', (e) => {
             if (e.target.id === 'loginModal') {
                 this.hideLoginModal();
@@ -56,6 +68,91 @@ class VetFlowApp {
         }
     }
 
+    // Registration Modal Methods
+    showRegisterModal() {
+        document.getElementById('registerModal').classList.remove('hidden');
+        document.getElementById('registerFullName').focus();
+    }
+
+    hideRegisterModal() {
+        document.getElementById('registerModal').classList.add('hidden');
+        document.getElementById('registerForm').reset();
+        document.getElementById('registerError').classList.add('hidden');
+        document.getElementById('registerSuccess').classList.add('hidden');
+        this.setRegisterLoading(false);
+    }
+
+    setRegisterLoading(loading) {
+        const submitBtn = document.querySelector('#registerForm button[type="submit"]');
+        const btnText = document.getElementById('registerBtnText');
+        const spinner = document.getElementById('registerSpinner');
+
+        if (loading) {
+            submitBtn.disabled = true;
+            btnText.textContent = 'Creating Account...';
+            spinner.classList.remove('hidden');
+        } else {
+            submitBtn.disabled = false;
+            btnText.textContent = 'Create Account';
+            spinner.classList.add('hidden');
+        }
+    }
+
+    showRegisterError(message) {
+        const errorDiv = document.getElementById('registerError');
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+        document.getElementById('registerSuccess').classList.add('hidden');
+    }
+
+    showRegisterSuccess(message) {
+        const successDiv = document.getElementById('registerSuccess');
+        successDiv.textContent = message;
+        successDiv.classList.remove('hidden');
+        document.getElementById('registerError').classList.add('hidden');
+    }
+
+    async handleRegister(e) {
+        e.preventDefault();
+        this.setRegisterLoading(true);
+
+        const formData = new FormData(e.target);
+        const fullName = formData.get('fullName');
+        const email = formData.get('email');
+        const password = formData.get('password');
+
+        try {
+            const response = await fetch('/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ fullName, email, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                this.showRegisterSuccess('Admin account created successfully! You can now login.');
+                // Clear form and switch to login after a delay
+                setTimeout(() => {
+                    this.hideRegisterModal();
+                    this.showLoginModal();
+                    // Pre-fill email in login form
+                    document.getElementById('email').value = email;
+                }, 2000);
+            } else {
+                this.showRegisterError(data.error || 'Registration failed');
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            this.showRegisterError('Network error. Please try again.');
+        } finally {
+            this.setRegisterLoading(false);
+        }
+    }
+
+    // Login Modal Methods
     showLoginModal() {
         document.getElementById('loginModal').classList.remove('hidden');
         document.getElementById('email').focus();
@@ -135,6 +232,7 @@ class VetFlowApp {
     showWelcome() {
         document.getElementById('welcomeSection').classList.remove('hidden');
         document.getElementById('dashboardSection').classList.add('hidden');
+        document.getElementById('registerBtn').classList.remove('hidden');
         document.getElementById('loginBtn').classList.remove('hidden');
         document.getElementById('logoutBtn').classList.add('hidden');
     }
@@ -142,6 +240,7 @@ class VetFlowApp {
     showDashboard() {
         document.getElementById('welcomeSection').classList.add('hidden');
         document.getElementById('dashboardSection').classList.remove('hidden');
+        document.getElementById('registerBtn').classList.add('hidden');
         document.getElementById('loginBtn').classList.add('hidden');
         document.getElementById('logoutBtn').classList.remove('hidden');
 
