@@ -121,6 +121,8 @@ class VetFlowApp {
         const email = formData.get('email');
         const password = formData.get('password');
 
+        console.log('Attempting registration with:', { fullName, email }); // Debug log
+
         try {
             const response = await fetch('/auth/register', {
                 method: 'POST',
@@ -130,7 +132,10 @@ class VetFlowApp {
                 body: JSON.stringify({ fullName, email, password })
             });
 
+            console.log('Registration response status:', response.status); // Debug log
+
             const data = await response.json();
+            console.log('Registration response data:', data); // Debug log
 
             if (response.ok) {
                 this.showRegisterSuccess('Admin account created successfully! You can now login.');
