@@ -1,0 +1,16 @@
+Bugs fixed:
+
+1. **server.js** - referenced non-existent './routes' directory and other missing modules, leading to runtime failure. Replaced with new Express app under `src/`.
+2. **package.json** - entry point declared as `src/index.js` but the file was missing. Added implementation.
+3. **Endpoints and middleware** - several files imported services/controllers that were absent. Implemented minimal authentication middleware and simple routes.
+4. **Login and homepage** - no working endpoints. Added `/auth/login` and protected home route `/` using JWT auth.
+5. **Testing** - project lacked tests. Added Jest tests to verify login success, failure, and access to homepage.
+6. **Deployment** - no Replit configuration files provided. Added `.replit` with run command and `replit.nix` specifying Node.js.
+
+7. **Authentication** - used hardcoded credentials and local JWT. Replaced with Supabase sign-in using `supabaseAuthJwtManager.js`.
+8. **Middleware** - JWT verification logic ignored Supabase tokens. Updated middleware to validate tokens via Supabase API.
+9. **Dependencies** - missing `@supabase/supabase-js` library required for auth. Added to `package.json`.
+10. **Homepage** - welcome message did not use Supabase user metadata. Now reads name from Supabase profile.
+11. **Tests** - updated Jest tests to mock Supabase authentication flow.
+
+These fixes allow the application to start, authenticate users via Supabase, and display the homepage on Replit.
