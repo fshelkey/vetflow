@@ -1,23 +1,20 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
+const { signInWithPassword } = require('../../supabaseAuthJwtManager');
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'secret123';
 
-const user = {
-  id: 1,
-  email: 'test@example.com',
-  password: 'password123',
-  name: 'Test User',
-};
-
-router.post('/login', (req, res) => {
-  const { email, password } = req.body;
-  if (email === user.email && password === user.password) {
-    const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '1h' });
-    return res.json({ token });
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const session = await signInWithPassword(email, password);
+    return res.json({
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+    });
+  } catch (err) {
+    const status = err.status || 401;
+    return res.status(status).json({ error: err.message || 'Invalid credentials' });
   }
-  return res.status(401).json({ error: 'Invalid credentials' });
 });
 
 module.exports = router;

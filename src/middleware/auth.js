@@ -1,22 +1,12 @@
-const jwt = require('jsonwebtoken');
+const { verifyToken } = require('../../supabaseAuthJwtManager');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secret123';
-
-module.exports = function auth(req, res, next) {
-  const authHeader = req.headers.authorization || '';
-  const token = authHeader.startsWith('Bearer ')
-    ? authHeader.slice(7)
-    : null;
-
-  if (!token) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
+module.exports = async function auth(req, res, next) {
   try {
-    const payload = jwt.verify(token, JWT_SECRET);
-    req.user = payload;
+    const user = await verifyToken(req.headers.authorization || '');
+    req.user = user;
     return next();
   } catch (err) {
-    return res.status(401).json({ error: 'Invalid token' });
+    const status = err.status || 401;
+    return res.status(status).json({ error: err.message || 'Unauthorized' });
   }
 };

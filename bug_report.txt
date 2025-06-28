@@ -6,5 +6,10 @@ Bugs fixed:
 4. **Login and homepage** - no working endpoints. Added `/auth/login` and protected home route `/` using JWT auth.
 5. **Testing** - project lacked tests. Added Jest tests to verify login success, failure, and access to homepage.
 6. **Deployment** - no Replit configuration files provided. Added `.replit` with run command and `replit.nix` specifying Node.js.
+7. **Authentication** - used hardcoded credentials and local JWT. Replaced with Supabase sign-in using `supabaseAuthJwtManager.js`.
+8. **Middleware** - JWT verification logic ignored Supabase tokens. Updated middleware to validate tokens via Supabase API.
+9. **Dependencies** - missing `@supabase/supabase-js` library required for auth. Added to `package.json`.
+10. **Homepage** - welcome message did not use Supabase user metadata. Now reads name from Supabase profile.
+11. **Tests** - updated Jest tests to mock Supabase authentication flow.
 
-These fixes allow the application to start, authenticate users with a hardcoded credential, and display the homepage on Replit.
+These fixes allow the application to start, authenticate users via Supabase, and display the homepage on Replit.
