@@ -19,7 +19,6 @@ describe('Authentication and homepage', () => {
       user: { id: '1', email: 'test@example.com', user_metadata: { name: 'Test User' } },
     });
     verifyToken.mockResolvedValue({ id: '1', email: 'test@example.com', user_metadata: { name: 'Test User' } });
-
     const loginRes = await request(app)
       .post('/auth/login')
       .send({ email: 'test@example.com', password: 'password123' })
